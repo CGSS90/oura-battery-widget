@@ -1,13 +1,115 @@
+
+
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Oura Authorization</title>
+
+  <meta name="viewport"
+
+        content="width=device-width, initial-scale=1">
+
+  <meta name="referrer" content="no-referrer">
+
+  <title>Oura Battery Widget - Authorization</title>
+
 </head>
+
 <body>
+
   <h2>Oura Battery Widget</h2>
-  <p>OAuth callback page is working!</p>
-  <p>Authorization setup is not yet complete.</p>
+
+  <p id="status">Checking authorization...</p>
+
+  <button id="copy" hidden>
+
+    Copy Access Token
+
+  </button>
+
+  <script>
+
+    const params = new URLSearchParams(
+
+      window.location.hash.substring(1)
+
+    );
+
+    const token = params.get("access_token");
+
+    const returnedState = params.get("state");
+
+    const error = params.get("error") ||
+
+      new URLSearchParams(
+
+        window.location.search
+
+      ).get("error");
+
+    // Remove the token from the visible URL.
+
+    history.replaceState(
+
+      null, "",
+
+      window.location.pathname
+
+    );
+
+    const status = document.getElementById("status");
+
+    const button = document.getElementById("copy");
+
+    if (token) {
+
+      status.textContent =
+
+        "Authorization successful. " +
+
+        "Copy your access token and keep it private.";
+
+      button.hidden = false;
+
+      button.onclick = async () => {
+
+        try {
+
+          await navigator.clipboard.writeText(token);
+
+          button.textContent = "Token Copied!";
+
+        } catch {
+
+          status.textContent =
+
+            "Unable to copy the token.";
+
+        }
+
+      };
+
+    } else if (error) {
+
+      status.textContent =
+
+        "Authorization failed: " + error;
+
+    } else {
+
+      status.textContent =
+
+        "Callback page is working. " +
+
+        "Waiting for Oura authorization.";
+
+    }
+
+  </script>
+
 </body>
+
 </html>
